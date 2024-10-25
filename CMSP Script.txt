@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMSP Script</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</head>
+<body>
+
+<div class="container">
+    <h1>CMSP Script</h1>
+    <p>Por favor, insira suas informações:</p>
+
+    <input type="text" id="ra" placeholder="Digite seu RA (ex: 0000111063394-4)" required>
+    <input type="password" id="senha" placeholder="Digite sua senha" required>
+    <div class="g-recaptcha" data-sitekey="SUA_CHAVE_DO_SITE_AQUI"></div> <!-- Substitua pela sua chave do site -->
+    <button id="loginButton">Login</button>
+    <div id="result"></div>
+
+    <footer>
+        <p>Desenvolvido por Deidara, assistente Prefeito52</p>
+    </footer>
+</div>
+
+<script>
+    async function login(ra, senha, recaptchaResponse) {
+        const url = 'https://api.exemplo.com/login'; // Substitua pela URL real da API de login
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    ra: ra,
+                    senha: senha,
+                    recaptcha: recaptchaResponse
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Login bem-sucedido:', data);
+                return data;
+            } else {
+                const errorData = await response.json();
+                console.error('Erro no login:', errorData);
+                throw new Error('Falha na autenticação: ' + errorData.message);
+            }
+        } catch (error) {
+            console.error('Erro ao fazer a requisição:', error);
+            throw error;
+        }
+    }
+
+    document.getElementById('loginButton').addEventListener('click', async () => {
+        const ra = document.getElementById('ra').value;
+        const senha = document.getElementById('senha').value;
+        const recaptchaResponse = grecaptcha.getResponse();
+
+        if (!recaptchaResponse) {
+            alert("Por favor, confirme que você não é um robô.");
+            return;
+        }
+
+        try {
+            const userData = await login(ra, senha, recaptchaResponse);
+            document.getElementById('result').innerText = "Login bem-sucedido!";
+            console.log(userData);
+        } catch (error) {
+            document.getElementById('result').innerText = error.message;
+        }
+    });
+</script>
+
+</body>
+</html>
